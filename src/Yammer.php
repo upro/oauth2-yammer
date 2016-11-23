@@ -15,7 +15,7 @@ class Yammer extends AbstractProvider
     /**
      * @var string Key used in a token response to identify the resource owner.
      */
-    const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'access_token.user_id';
+    const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'user.id';
 
     /**
      * Get authorization url to begin OAuth flow
@@ -48,7 +48,7 @@ class Yammer extends AbstractProvider
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
-        return 'https://www.yammer.com/api/v1/users/current.json';
+        return 'https://www.yammer.com/api/v1/users/'.$token->getResourceOwnerId().'.json';
     }
 
     /**
@@ -100,6 +100,10 @@ class Yammer extends AbstractProvider
         $result = parent::prepareAccessTokenResponse($result);
         $response = !empty($result['access_token']) ? $result['access_token'] : [];
 
+        if (!empty($result['resource_owner_id'])) {
+            $response['resource_owner_id'] = $result['resource_owner_id'];
+        }
+
         if (!empty($response['token'])) {
             $response['access_token'] = $response['token'];
         }
@@ -121,6 +125,6 @@ class Yammer extends AbstractProvider
      */
     protected function createResourceOwner(array $response, AccessToken $token)
     {
-        return new YammerResourceOwner(isset($response['user']) ? $response['user'] : $response);
+        return new YammerResourceOwner($response);
     }
 }
