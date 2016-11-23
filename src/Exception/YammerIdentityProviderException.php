@@ -1,6 +1,6 @@
 <?php
 
-namespace UPro\Yammer\OAuth2\Client\Provider\Exception;
+namespace UPro\OAuth2\Client\Provider\Exception;
 
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Psr\Http\Message\ResponseInterface;

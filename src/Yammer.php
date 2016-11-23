@@ -2,7 +2,7 @@
 
 namespace UPro\OAuth2\Client\Provider;
 
-use UPro\Yammer\OAuth2\Client\Provider\Exception\YammerIdentityProviderException;
+use UPro\OAuth2\Client\Provider\Exception\YammerIdentityProviderException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
@@ -11,6 +11,11 @@ use Psr\Http\Message\ResponseInterface;
 class Yammer extends AbstractProvider
 {
     use BearerAuthorizationTrait;
+
+    /**
+     * @var string Key used in a token response to identify the resource owner.
+     */
+    const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'access_token.user_id';
 
     /**
      * Get authorization url to begin OAuth flow
@@ -78,6 +83,32 @@ class Yammer extends AbstractProvider
         if ($response->getStatusCode() >= 400) {
             throw YammerIdentityProviderException::clientException($response, $data);
         }
+    }
+
+    /**
+     * Prepares an parsed access token response for a grant.
+     *
+     * Custom mapping of expiration, etc should be done here. Always call the
+     * parent method when overloading this method.
+     *
+     * @param  mixed $result
+     *
+     * @return array
+     */
+    protected function prepareAccessTokenResponse(array $result)
+    {
+        $result = parent::prepareAccessTokenResponse($result);
+        $response = !empty($result['access_token']) ? $result['access_token'] : [];
+
+        if (!empty($response['token'])) {
+            $response['access_token'] = $response['token'];
+        }
+
+        if (!empty($response['expires_at'])) {
+            $response['expires'] = strtotime($response['expires_at']);
+        }
+
+        return $response;
     }
 
     /**
