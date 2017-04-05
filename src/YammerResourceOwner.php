@@ -37,6 +37,16 @@ class YammerResourceOwner implements ResourceOwnerInterface
     }
 
     /**
+     * Return if resource owner is active.
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->getValueByKey($this->response, 'state') == 'active';
+    }
+
+    /**
      * Get resource owner email
      *
      * @return string|null
@@ -74,6 +84,16 @@ class YammerResourceOwner implements ResourceOwnerInterface
     public function getLastName()
     {
         return $this->getValueByKey($this->response, 'last_name');
+    }
+
+    /**
+     * Get the resource owner profile photo.
+     *
+     * @return string|null
+     */
+    public function getPhotoUrl()
+    {
+        return $this->getValueByKey($this->response, 'mugshot_url');
     }
 
     /**
